@@ -84,4 +84,17 @@ class TestRbdbg < RbdbgTest
 
     assert_equal word, bytes.pack("C*").unpack1("Q")
   end
+
+  def test_mem_read
+    child_pid = spawn("sleep", "1")
+    sleep 0.1
+    debugee = Rbdbg.attach_pid(child_pid)
+
+    rsp = debugee.regs.rsp
+
+    word = debugee.peek_word(rsp)
+
+    data = debugee.mem.read(rsp, 8)
+    assert_equal word, data.unpack1("Q")
+  end
 end

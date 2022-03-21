@@ -46,7 +46,23 @@ module Rbdbg
     end
   end
 
+  class AddressSpace
+    def initialize(debugee)
+      @debugee = debugee
+      @pid = debugee.pid
+    end
+
+    def read(address, bytesize)
+      File.open("/proc/#{@pid}/mem", "rb") do |f|
+        f.seek address
+        f.read bytesize
+      end
+    end
+  end
+
   class Debugee
+    attr_reader :pid
+
     def initialize(pid)
       @pid = pid
     end
@@ -66,6 +82,10 @@ module Rbdbg
       addr_base = addr - addr_offset
       word = Rbdbg.ptrace_peektext(@pid, addr_base)
       (word >> (addr_offset * 8)) & 0xff
+    end
+
+    def mem
+      AddressSpace.new(self)
     end
   end
 
