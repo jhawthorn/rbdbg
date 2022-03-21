@@ -56,6 +56,17 @@ module Rbdbg
       Regs::X86_64.new(*regs)
     end
     alias regs registers
+
+    def peek_word(addr)
+      Rbdbg.ptrace_peektext(@pid, addr)
+    end
+
+    def peek_byte(addr)
+      addr_offset = addr & 7
+      addr_base = addr - addr_offset
+      word = Rbdbg.ptrace_peektext(@pid, addr_base)
+      (word >> (addr_offset * 8)) & 0xff
+    end
   end
 
   def self.attach_pid(pid)

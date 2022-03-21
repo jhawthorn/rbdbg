@@ -37,6 +37,18 @@ ptrace_detach(VALUE _self, VALUE pid) {
     return pid;
 }
 
+#if SIZEOF_LONG == SIZEOF_VOIDP
+#define NUM2PTR(x) ((void *)NUM2ULONG(x))
+#elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#define NUM2PTR(x) ((void *)NUM2ULL(x))
+#endif
+
+static VALUE
+ptrace_peektext(VALUE _self, VALUE pid, VALUE addr) {
+    long val = PTRACE_SAFE(PTRACE_PEEKTEXT, NUM2PIDT(pid), NUM2PTR(addr), 0L);
+    return LONG2NUM(val);
+}
+
 static VALUE
 ptrace_getregset(VALUE _self, VALUE pid) {
     long buf[128];
@@ -62,4 +74,5 @@ Init_rbdbg(void)
   rb_define_singleton_method(rb_mRbdbg, "ptrace_cont", ptrace_cont, 1);
   rb_define_singleton_method(rb_mRbdbg, "ptrace_detach", ptrace_detach, 1);
   rb_define_singleton_method(rb_mRbdbg, "ptrace_getregset", ptrace_getregset, 1);
+  rb_define_singleton_method(rb_mRbdbg, "ptrace_peektext", ptrace_peektext, 2);
 }
