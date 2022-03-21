@@ -51,7 +51,6 @@ ptrace_getregset(VALUE _self, VALUE pid) {
         VALUE val = ULONG2NUM(buf[i]);
         rb_ary_push(arr, val);
     }
-    fprintf(stderr, "read %lu bytes\n", regs.iov_len);
     return arr;
 }
 

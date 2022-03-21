@@ -26,26 +26,30 @@ class TestRbdbg < RbdbgTest
   def test_attach_pid
     child_pid = spawn("sleep", "1")
     debugee = Rbdbg.attach_pid(child_pid)
-    p debugee
+    assert debugee
   end
 
   def test_ptrace_detach
-    child_pid = spawn("sleep", "1")
+    child_pid = spawn("sleep", "0.5")
     sleep 0.1
     Rbdbg.attach_pid(child_pid)
 
     Rbdbg.ptrace_detach(child_pid)
 
-    # FIXME
+    # Wait for proper clean exit
     _, status = Process.waitpid2(child_pid)
-    p status
-    #assert status.exited?
+    assert status.exited?
+    assert status.success?
   end
 
   def test_registers
     child_pid = spawn("sleep", "1")
     sleep 0.1
     debugee = Rbdbg.attach_pid(child_pid)
-    p debugee.registers
+    regs = debugee.registers
+
+    # All regs should be filled
+    nil_regs = regs.to_h.select { |k, v| v.nil? }
+    assert_empty nil_regs, "Expected all regs to have values, missing #{nil_regs.keys.inspect}"
   end
 end
