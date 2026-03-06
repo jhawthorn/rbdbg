@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "rbdbg/version"
-require_relative "rbdbg/rbdbg"
+require "rbdbg/rbdbg"
 
 module Rbdbg
   class Error < StandardError; end
